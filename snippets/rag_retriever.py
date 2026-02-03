@@ -239,7 +239,9 @@ class RAGRetriever:
                 "content": snippet.content,
                 "language": getattr(snippet, 'language', 'python'),
             })
-            ids.append(f"{snippet.category or 'root'}/{snippet.name}")
+            # Include language/extension to make IDs unique (handles add.py vs add.js)
+            lang = getattr(snippet, 'language', 'unknown')
+            ids.append(f"{snippet.category or 'root'}/{snippet.name}.{lang}")
         
         # Generate embeddings
         embeddings = self.model.encode(documents, show_progress_bar=True)
