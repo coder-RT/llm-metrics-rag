@@ -1,14 +1,14 @@
 """
-LLM Metrics Proxy Server
+LLM Metrics RAG Proxy Server
 
 A FastAPI-based proxy server that intercepts LLM API calls from tools
-like Cline, captures usage metrics, and optionally enforces snippet-grounded mode.
+like Cline, captures usage metrics, and uses RAG for snippet retrieval.
 
 Run with:
-    uvicorn llmMetrics.proxy.server:app --host 0.0.0.0 --port 8000
+    uvicorn llmMetricsRAG.proxy.server:app --host 0.0.0.0 --port 8000
 
 Or programmatically:
-    from llmMetrics.proxy import start_server
+    from llmMetricsRAG.proxy import start_server
     start_server(port=8000)
 """
 

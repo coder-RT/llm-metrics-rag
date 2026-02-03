@@ -15,8 +15,8 @@ import os
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from llmMetrics.config_loader import get_config
-from llmMetrics.proxy.server import start_server
+from llmMetricsRAG.config_loader import get_config
+from llmMetricsRAG.proxy.server import start_server
 
 
 def main():
@@ -61,7 +61,7 @@ Configuration:
         print(f"Starting LLM Metrics Proxy on {args.host}:{args.port} (with auto-reload)")
         print(f"Target API: {config.proxy.target_url}")
         uvicorn.run(
-            "llmMetrics.proxy.server:app",
+            "llmMetricsRAG.proxy.server:app",
             host=args.host,
             port=args.port,
             reload=True
