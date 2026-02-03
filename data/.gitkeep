@@ -1,0 +1,3 @@
+# This directory contains SQLite databases
+# - llm_metrics.db: Metrics tracking data
+# - hackathon_config.db: Problem configurations

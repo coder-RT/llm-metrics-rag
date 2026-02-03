@@ -1,0 +1,142 @@
+# =============================================================================
+# LLM Metrics Configuration
+# =============================================================================
+# This file controls the behavior of the LLM Metrics Proxy, including
+# snippet-grounded mode settings and cost estimation parameters.
+
+# -----------------------------------------------------------------------------
+# Snippet-Grounded Mode Settings
+# -----------------------------------------------------------------------------
+# These settings apply ONLY when the toggle is ON (snippet_grounded mode)
+
+snippet_grounded_mode:
+  # Maximum tokens the LLM can generate in response
+  # Lower values = shorter, more focused responses = lower cost
+  # Set to null to disable limit
+  max_tokens: 500
+  
+  # Grounding prompt strictness level
+  # Options: "strict", "moderate", "light"
+  #   - strict: Very restrictive, no new code allowed
+  #   - moderate: Balanced, can suggest modifications (default)
+  #   - light: Gentle guidance only
+  strictness: "moderate"
+  
+  # Add a reminder about snippet mode in long conversations
+  add_reminder: true
+  
+  # Number of messages before adding the reminder
+  reminder_threshold: 8
+  
+  # Include source file path in the prompt
+  # Shows users where the code snippets come from
+  show_source_path: true
+  
+  # Auto-load all snippets when snippet mode is enabled
+  # If true, all snippets from all directories are available
+  # If false, only snippets attached to the specific problem are used
+  auto_load_all_snippets: true
+  
+  # Smart snippet selection (only used when auto_load_all_snippets is true)
+  # If true, only snippets relevant to the user's query are loaded
+  # This significantly reduces token usage in conversations
+  smart_selection: true
+  
+  # Use RAG (Retrieval-Augmented Generation) for snippet selection
+  # RAG uses semantic search with embeddings for better matching
+  # Requires: pip install chromadb sentence-transformers
+  # If false or dependencies missing, falls back to keyword matching
+  use_rag: true
+  
+  # Maximum snippets to include when using smart/RAG selection
+  # Lower = fewer tokens, but might miss relevant snippets
+  # RAG is very accurate, so 1-2 snippets is usually enough
+  max_snippets: 2
+  
+  # Minimum match score for smart/RAG selection (0.0 to 1.0)
+  # Higher = stricter matching, fewer snippets
+  # RAG scores are more meaningful, so 0.3-0.5 is recommended
+  min_match_score: 0.3
+  
+  # File extensions to include as code snippets
+  # Other files (like README.md) will be ignored
+  snippet_extensions:
+    - ".py"
+    - ".js"
+    - ".jsx"
+    - ".ts"
+    - ".tsx"
+    - ".java"
+    - ".go"
+    - ".rs"
+    - ".cpp"
+    - ".c"
+    - ".rb"
+
+# -----------------------------------------------------------------------------
+# Free-Form Mode Settings  
+# -----------------------------------------------------------------------------
+# These settings apply when the toggle is OFF (free_form mode)
+
+free_form_mode:
+  # No token limit in free-form mode (set to null)
+  max_tokens: null
+  
+  # Whether to still track metrics in free-form mode
+  track_metrics: true
+
+# -----------------------------------------------------------------------------
+# Cost Estimation Settings
+# -----------------------------------------------------------------------------
+# Used for calculating cost savings in reports
+
+cost_settings:
+  # Cost per 1000 input tokens (in USD)
+  input_cost_per_1k: 0.03
+  
+  # Cost per 1000 output tokens (in USD)  
+  output_cost_per_1k: 0.06
+  
+  # Default model for cost estimation
+  model: "gpt-4"
+
+# -----------------------------------------------------------------------------
+# Proxy Server Settings
+# -----------------------------------------------------------------------------
+
+proxy:
+  # Server host and port
+  host: "0.0.0.0"
+  port: 8000
+  
+  # Your organization's LLM API endpoint (OpenAI-compatible)
+  # This is where requests will be forwarded after metrics capture
+  # Examples:
+  #   - "https://api.openai.com/v1" (default OpenAI)
+  #   - "https://your-org.example.com/v1" (your org's proxy)
+  #   - "http://localhost:11434/v1" (local Ollama)
+  target_url: "https://api.openai.com/v1"
+  
+  # Request timeout in seconds
+  timeout: 120
+  
+  # SSL certificate verification
+  # Options:
+  #   - true: Verify SSL certificates (default, recommended for production)
+  #   - false: Disable SSL verification (for testing/internal networks)
+  #   - "/path/to/ca-bundle.crt": Use custom CA certificate
+  verify_ssl: false
+  
+  # Enable debug logging
+  debug: false
+
+# -----------------------------------------------------------------------------
+# Database Settings
+# -----------------------------------------------------------------------------
+
+database:
+  # Path to metrics database (relative to llmMetrics directory)
+  metrics_db: "data/llm_metrics.db"
+  
+  # Path to config database (relative to llmMetrics directory)
+  config_db: "data/hackathon_config.db"

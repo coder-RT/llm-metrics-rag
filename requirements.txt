@@ -1,0 +1,8 @@
+# LLM Metrics Tracking System Dependencies
+
+# Token counting library (OpenAI's tokenizer)
+tiktoken>=0.5.0
+
+# Data validation and settings management
+pydantic>=2.0.0
+
