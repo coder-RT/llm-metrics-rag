@@ -55,8 +55,9 @@ snippet_grounded_mode:
   
   # Minimum match score for smart/RAG selection (0.0 to 1.0)
   # Higher = stricter matching, fewer snippets
-  # RAG scores are more meaningful, so 0.3-0.5 is recommended
-  min_match_score: 0.3
+  # Note: Large headers/comments in snippets can lower scores
+  # 0.1 is recommended when snippets have standard headers
+  min_match_score: 0.1
   
   # File extensions to include as code snippets
   # Other files (like README.md) will be ignored

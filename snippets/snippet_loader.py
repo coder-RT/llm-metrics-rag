@@ -266,7 +266,7 @@ class SnippetLoader:
                 # Skip README, internal files, and non-code files
                 skip_files = (
                     "readme.md", "readme.txt", "readme",
-                    "snippet_loader.py", "snippet_matcher.py",  # Internal modules
+                    "snippet_loader.py", "snippet_matcher.py", "rag_retriever.py",  # Internal modules
                     "__init__.py",
                 )
                 if file_name.lower() in skip_files:

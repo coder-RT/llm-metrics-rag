@@ -121,6 +121,74 @@ class RAGRetriever:
             self._model = SentenceTransformer(self.model_name)
         return self._model
     
+    def _extract_searchable_content(self, name: str, category: str, content: str) -> str:
+        """
+        Extract the most meaningful parts of a snippet for embedding.
+        
+        This improves RAG matching by:
+        1. Removing boilerplate headers/comments
+        2. Emphasizing function names and docstrings
+        3. Including keywords for better semantic matching
+        """
+        import re
+        
+        lines = content.split('\n')
+        meaningful_parts = []
+        
+        # Add name and category with high weight (repeated for emphasis)
+        meaningful_parts.append(f"{name} {name} {name}")
+        if category and category != "root":
+            meaningful_parts.append(f"{category}")
+        
+        # Extract function definitions and their docstrings
+        in_docstring = False
+        docstring_content = []
+        
+        for line in lines:
+            stripped = line.strip()
+            
+            # Skip header comments (lines starting with # at the top)
+            if stripped.startswith('#') and not meaningful_parts[1:]:
+                continue
+            
+            # Capture function definitions
+            if stripped.startswith('def ') or stripped.startswith('async def '):
+                # Extract function name and signature
+                func_match = re.match(r'(?:async\s+)?def\s+(\w+)\s*\(([^)]*)\)', stripped)
+                if func_match:
+                    func_name = func_match.group(1)
+                    # Add function name multiple times for emphasis
+                    meaningful_parts.append(f"{func_name} {func_name}")
+            
+            # Capture class definitions
+            if stripped.startswith('class '):
+                class_match = re.match(r'class\s+(\w+)', stripped)
+                if class_match:
+                    class_name = class_match.group(1)
+                    meaningful_parts.append(f"{class_name} {class_name}")
+            
+            # Capture docstrings
+            if '"""' in stripped or "'''" in stripped:
+                quote = '"""' if '"""' in stripped else "'''"
+                if stripped.count(quote) >= 2:
+                    # Single line docstring
+                    docstring = stripped.strip(quote).strip()
+                    if docstring:
+                        meaningful_parts.append(docstring)
+                elif not in_docstring:
+                    in_docstring = True
+                    docstring_content = [stripped.replace(quote, '').strip()]
+                else:
+                    docstring_content.append(stripped.replace(quote, '').strip())
+                    meaningful_parts.append(' '.join(docstring_content))
+                    in_docstring = False
+                    docstring_content = []
+            elif in_docstring:
+                docstring_content.append(stripped)
+        
+        result = ' '.join(meaningful_parts)
+        return result if result.strip() else f"{name} {category} code snippet"
+    
     def index_snippets(self, snippets: List[Any], force_reindex: bool = False) -> int:
         """
         Index snippets for semantic search.
@@ -158,8 +226,11 @@ class RAGRetriever:
         ids = []
         
         for snippet in snippets:
-            # Create searchable text combining name, category, and content
-            searchable_text = f"{snippet.name} {snippet.category} {snippet.content}"
+            # Extract meaningful content for indexing (function names, docstrings)
+            # This improves matching by removing boilerplate headers
+            searchable_text = self._extract_searchable_content(
+                snippet.name, snippet.category, snippet.content
+            )
             
             documents.append(searchable_text)
             metadatas.append({
